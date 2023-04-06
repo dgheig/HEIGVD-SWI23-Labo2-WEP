@@ -27,14 +27,44 @@ Vous allez devoir faire des recherches sur internet pour apprendre à utiliser S
 Dans cette partie, vous allez récupérer le script Python [manual-decryption.py](files/manual-decryption.py). Il vous faudra également le fichier de capture [arp.cap](files/arp.cap) contenant un message arp chiffré avec WEP et la librairie [rc4.py](files/rc4.py) pour générer les keystreams indispensables pour chiffrer/déchiffrer WEP. Tous les fichiers doivent être copiés dans le même répertoire local sur vos machines.
 
 - Ouvrir le fichier de capture [arp.cap](files/arp.cap) avec Wireshark
-   
+
 - Utiliser Wireshark pour déchiffrer la capture. Pour cela, il faut configurer dans Wireshark la clé de chiffrement/déchiffrement WEP (Dans Wireshark : Preferences&rarr;Protocols&rarr;IEEE 802.11&rarr;Decryption Keys). Il faut également activer le déchiffrement dans la fenêtre IEEE 802.11 (« Enable decryption »). Vous trouverez la clé dans le script Python [manual-decryption.py](files/manual-decryption.py).
-   
+
+  ![](img/cap_wireshark_b4_decryption.png)
+
+  ![](img/cap_wireshark_after_decryption.png)
+
 - Exécuter le script avec `python manual-decryption.py`
-   
+
 - Comparer la sortie du script avec la capture text déchiffrée par Wireshark
-   
+
+  ![](img/1_script_output.png)
+
+  Dans l'ordre des rectangles (gauche à droite):
+
+  1. En-tête LLC
+  2. Hardware Type
+  3. Protocol Type
+  4. Hardware Size
+  5. Protocol Size
+  6. Opcode
+  7. Sender MAC address
+  8. Sender IP address
+  9. Target MAC address
+  10. Target IP address
+
+  On retrouve donc les mêmes données que dans Wireshark, sauf que c'est les octets en brut plutôt que joliment formatté comme le faire Wireshark
+
 - Analyser le fonctionnement du script
+
+  - On commence par déclarer la clé WEP
+  - On lit ensuite le message ARP depuis la capture `.cap` fournie
+  - On construit la graine en concaténant l'IV et la clé WEP
+  - On récupère les bytes correspondants à l'IV chiffré du `.cap`
+  - On récupère la totalité des données chiffrées de la trame 802.11 du `.cap`
+  - On initialise une boîte de chiffrement RC4 avec la graine construite plus tôt
+  - On récupère ensuite le texte clair
+  - Et on affiche les données
 
 ### 2. Chiffrement manuel de WEP
 
